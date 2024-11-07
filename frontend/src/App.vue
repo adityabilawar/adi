@@ -1,6 +1,28 @@
 <template>
-  <div id="app" class="container">
-    <div class="row">
+  <div id="app">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+      <div class="container">
+        <router-link class="navbar-brand" to="/">Adi's Dashboard</router-link>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <router-link class="nav-link" to="/dashboard">Dashboard</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/blog">Blog</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/goals">Goals</router-link>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+    <div v-if="!isLoggedIn" class="row">
       <div class="col-md-6 offset-md-3 py-5">
         <h1>Greetings Adi</h1>
         <div class="button-group">
@@ -18,20 +40,48 @@
             <button class="btn btn-primary">Login</button>
           </div>
         </form>
-
       </div>
     </div>
+    <Home v-if="isLoggedIn" />
   </div>
+</div>
 </template>
+
+<style>
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border: none;
+  border-radius: 8px;
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #eee;
+  font-weight: 600;
+}
+</style>
 
 <script>
 import axios from 'axios'; 
 
+import Home from './components/Home.vue'
+
 export default {
   name: 'App',
-
+  components: {
+    Home
+  },
   data() {
-    return { password: '' }; // Add a password property
+    return {
+      password: '',
+      isLoggedIn: false
+    };
   },
 
   methods: {
@@ -55,8 +105,7 @@ export default {
         .then((response) => {
           if(response.data == "Login successful") {
             console.log(`Login successful`);
-
-            //Redirect to the dashboard *********
+            this.isLoggedIn = true;
 
           } else {
             console.log(`Incorrect password, please try again`);

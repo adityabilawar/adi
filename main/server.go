@@ -6,10 +6,17 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
 // web server that listens for incoming requests
 func main() {
+	// Load .env file
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	// Use the login function
 	http.HandleFunc("/api/login", login)
 
@@ -30,6 +37,16 @@ type Credentials struct {
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
+	// Add CORS headers
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+	// Handle preflight OPTIONS request
+	if r.Method == http.MethodOptions {
+		return
+	}
+
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
@@ -48,7 +65,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if creds.Password == "password" {
+	if creds.Password == os.Getenv("pass") {
 		fmt.Fprintf(w, "Login successful")
 	} else {
 		fmt.Fprintf(w, "Login failed")
